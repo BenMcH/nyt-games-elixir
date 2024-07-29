@@ -40,7 +40,7 @@ defmodule NytgamesWeb.Wordle do
     <.word :for={guess <- @guesses} guess={guess} />
 
     <form :if={Enum.all?(@guesses, &(&1.guess !== @word)) && length(@guesses) < 6} phx-submit="guess">
-      <input type="text" name="guess" />
+      <input type="text" name="guess" phx-hook="Focus" id="guess" />
       <button type="submit">Guess</button>
     </form>
 
@@ -54,9 +54,8 @@ defmodule NytgamesWeb.Wordle do
   end
 
   def word(assigns) do
-    guess = assigns.guess
-
-    colors = WordleGuess.colors(guess)
+    colors = WordleGuess.colors(assigns.guess)
+    assigns = assign(assigns, :colors, colors)
 
     ~H"""
     <div class="flex flex-row gap-2 mb-2">
@@ -73,7 +72,7 @@ defmodule NytgamesWeb.Wordle do
           "text-white",
           "font-bold",
           "text-3xl",
-          Enum.at(colors, index)
+          Enum.at(@colors, index)
         ]}
       >
         <%= point %>
