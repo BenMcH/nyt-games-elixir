@@ -46,7 +46,7 @@ defmodule NytgamesWeb.Wordle do
 
     <h2 :if={Enum.any?(@guesses, &(&1.guess === @word))} class="text-2xl">Winner!</h2>
     <h2 :if={length(@guesses) === 6 && Enum.all?(@guesses, &(&1.guess !== @word))} class="text-2xl">
-      Maybe next time!
+      Maybe next time! Word was: <%= @word %>
     </h2>
 
     <h2 class="text-xl">Guesses: <%= length(@guesses) %>/6</h2>
