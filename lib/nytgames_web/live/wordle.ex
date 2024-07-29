@@ -19,6 +19,7 @@ defmodule NytgamesWeb.Wordle do
   @impl true
   def handle_event("guess", %{"guess" => guess}, socket) do
     guesses = socket.assigns.guesses
+    guess = guess |> String.downcase()
 
     if Enum.any?(guesses, &(&1.guess === guess)) || String.length(guess) !== 5 do
       {:noreply, socket}
