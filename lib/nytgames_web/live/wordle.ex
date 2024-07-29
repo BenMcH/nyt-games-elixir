@@ -20,7 +20,7 @@ defmodule NytgamesWeb.Wordle do
   def handle_event("guess", %{"guess" => guess}, socket) do
     guesses = socket.assigns.guesses
 
-    if guess in guesses || String.length(guess) !== 5 do
+    if Enum.any?(guesses, &(&1.guess === guess)) || String.length(guess) !== 5 do
       {:noreply, socket}
     else
       {:noreply,

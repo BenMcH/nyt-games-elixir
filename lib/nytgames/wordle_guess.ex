@@ -20,7 +20,7 @@ defmodule Nytgames.WordleGuess do
     |> Enum.map(fn letter ->
       cond do
         letter === :green -> "bg-green-700"
-        letter === :yellow -> "bg-yellow-400"
+        letter === :yellow -> "bg-yellow-500"
         true -> "bg-slate-700"
       end
     end)
