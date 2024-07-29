@@ -41,7 +41,7 @@ defmodule NytgamesWeb.Wordle do
     <.word :for={guess <- @guesses} guess={guess} />
 
     <form :if={Enum.all?(@guesses, &(&1.guess !== @word)) && length(@guesses) < 6} phx-submit="guess">
-      <input type="text" name="guess" phx-hook="Focus" id="guess" />
+      <input type="text" name="guess" phx-hook="Focus" id="guess" minlength="5" maxlength="5" />
       <button type="submit">Guess</button>
     </form>
 
