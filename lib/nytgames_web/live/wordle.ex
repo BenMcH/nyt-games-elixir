@@ -27,7 +27,7 @@ defmodule NytgamesWeb.Wordle do
        assign(
          socket,
          :guesses,
-         guesses ++ [%WordleGuess{target: socket.assigns.word, guess: guess}]
+         guesses ++ [WordleGuess.make_guess(guess, socket.assigns.word)]
        )}
     end
   end
@@ -54,9 +54,6 @@ defmodule NytgamesWeb.Wordle do
   end
 
   def word(assigns) do
-    colors = WordleGuess.colors(assigns.guess)
-    assigns = assign(assigns, :colors, colors)
-
     ~H"""
     <div class="flex flex-row gap-2 mb-2">
       <span
@@ -72,7 +69,7 @@ defmodule NytgamesWeb.Wordle do
           "text-white",
           "font-bold",
           "text-3xl",
-          Enum.at(@colors, index)
+          Enum.at(@guess.colors, index)
         ]}
       >
         <%= point %>

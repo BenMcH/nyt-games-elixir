@@ -1,11 +1,17 @@
 defmodule Nytgames.WordleGuess do
   alias Nytgames.WordleGuess
-  @enforce_keys [:target, :guess]
-  defstruct [:target, :guess]
+  @enforce_keys [:guess, :colors]
+  defstruct [:guess, :colors]
 
-  def colors(%WordleGuess{} = guess) do
-    letters = guess.guess |> String.codepoints()
-    target_letters = guess.target |> String.codepoints()
+  def make_guess(guess, target) do
+    colors = get_colors(guess, target)
+
+    %WordleGuess{guess: guess, colors: colors}
+  end
+
+  defp get_colors(guess, target) do
+    letters = guess |> String.codepoints()
+    target_letters = target |> String.codepoints()
 
     {letters, target_letters} = do_greens(letters, target_letters)
 
