@@ -4,16 +4,23 @@ defmodule NytgamesWeb.Wordle do
 
   @words File.read!("words.txt") |> String.split()
 
-  @impl true
-  def mount(_params, _session, socket) do
+  defp new_game(socket) do
     word = Enum.random(@words)
 
-    socket =
-      socket
-      |> assign(:word, word)
-      |> assign(:guesses, [])
+    socket
+    |> assign(:word, word)
+    |> assign(:status, :playing)
+    |> assign(:guesses, [])
+  end
 
-    {:ok, socket}
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, socket |> new_game()}
+  end
+
+  @impl true
+  def handle_event("new_game", _, socket) do
+    {:noreply, socket |> new_game()}
   end
 
   @impl true
@@ -24,12 +31,19 @@ defmodule NytgamesWeb.Wordle do
     if Enum.any?(guesses, &(&1.guess === guess)) || String.length(guess) !== 5 do
       {:noreply, socket}
     else
-      {:noreply,
-       assign(
-         socket,
-         :guesses,
-         guesses ++ [WordleGuess.make_guess(guess, socket.assigns.word)]
-       )}
+      status =
+        cond do
+          guess === socket.assigns.word -> :winner
+          length(guesses) === 5 -> :loser
+          true -> :playing
+        end
+
+      socket =
+        socket
+        |> assign(:status, status)
+        |> assign(:guesses, guesses ++ [WordleGuess.make_guess(guess, socket.assigns.word)])
+
+      {:noreply, socket}
     end
   end
 
@@ -40,15 +54,16 @@ defmodule NytgamesWeb.Wordle do
 
     <.word :for={guess <- @guesses} guess={guess} />
 
-    <form :if={Enum.all?(@guesses, &(&1.guess !== @word)) && length(@guesses) < 6} phx-submit="guess">
+    <form :if={@status === :playing} phx-submit="guess">
       <input type="text" name="guess" phx-hook="Focus" id="guess" minlength="5" maxlength="5" />
       <button type="submit">Guess</button>
     </form>
 
-    <h2 :if={Enum.any?(@guesses, &(&1.guess === @word))} class="text-2xl">Winner!</h2>
-    <h2 :if={length(@guesses) === 6 && Enum.all?(@guesses, &(&1.guess !== @word))} class="text-2xl">
+    <h2 :if={@status === :winner} class="text-2xl">Winner!</h2>
+    <h2 :if={@status === :loser} class="text-2xl">
       Maybe next time! Word was: <%= @word %>
     </h2>
+    <div :if={@status !== :playing}><button phx-click="new_game">Try again</button></div>
 
     <h2 class="text-xl">Guesses: <%= length(@guesses) %>/6</h2>
     """
